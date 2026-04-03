@@ -21,7 +21,6 @@
         "craftsys/msg91-laravel": "^0.15.1",
         "cviebrock/eloquent-sluggable": "^10.0",
         "gizemsever/laravel-paytr": "^2.1",
-        "guysolamour/laravel-cinetpay": "^2.0",
         "guzzlehttp/guzzle": "^7.2",
         "hiqdev/omnipay-robokassa": "^3.3",
         "instamojo/instamojo-php": "^1.0",
