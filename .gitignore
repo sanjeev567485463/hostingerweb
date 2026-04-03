@@ -19,3 +19,8 @@ npm-debug.log
 yarn-error.log
 composer.lock
 storage/debugbar/.gitignore
+
+# Environment files (never commit secrets)
+.env
+.env.*
+!.env.example
