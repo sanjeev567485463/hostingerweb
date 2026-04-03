@@ -1624,8 +1624,19 @@ function truncate($text, $length, $withTail = true)
 
 function getAdminPanelUrlPrefix()
 {
-    $prefix = getGeneralSecuritySettings('admin_panel_url');
-    return !empty($prefix) ? $prefix : 'admin';
+    $defaultPrefix = env('ADMIN_PANEL_URL', 'admin');
+
+    // During artisan/composer scripts, avoid hitting DB-dependent settings.
+    if (app()->runningInConsole()) {
+        return $defaultPrefix;
+    }
+
+    try {
+        $prefix = getGeneralSecuritySettings('admin_panel_url');
+        return !empty($prefix) ? $prefix : $defaultPrefix;
+    } catch (\Throwable $e) {
+        return $defaultPrefix;
+    }
 }
 
 function getAdminPanelUrl($url = null, $withFirstSlash = true)
