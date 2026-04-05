@@ -109,6 +109,7 @@ class PaymentsController extends Controller
 
 
         $paymentChannel = PaymentChannel::where('id', $gateway)
+            ->where('class_name', PaymentChannel::$razorpay)
             ->where('status', 'active')
             ->first();
 
@@ -123,15 +124,7 @@ class PaymentsController extends Controller
             $channelManager = ChannelManager::makeChannel($paymentChannel);
             $redirect_url = $channelManager->paymentRequest($order);
 
-
-            if (in_array($paymentChannel->class_name, ['Paytm', 'Payu', 'Zarinpal', 'Stripe', 'Paysera', 'Cashu', 'Iyzipay', 'MercadoPago'])) {
-
-                return $redirect_url;
-            }
-
             return $redirect_url;
-            //      dd($redirect_url) ;
-            return Redirect::away($redirect_url);
 
         } catch (\Exception $exception) {
 
@@ -145,6 +138,10 @@ class PaymentsController extends Controller
 
     public function paymentVerify(Request $request, $gateway)
     {
+        if ($gateway !== PaymentChannel::$razorpay) {
+            abort(404);
+        }
+
         $paymentChannel = PaymentChannel::where('class_name', $gateway)
             ->where('status', 'active')
             ->first();
@@ -318,19 +315,11 @@ class PaymentsController extends Controller
         ]);
 
 
-        if ($paymentChannel->class_name == 'Razorpay') {
+        if ($paymentChannel->class_name == PaymentChannel::$razorpay) {
             return $this->echoRozerpayForm($order);
-        } else {
-            $paymentController = new PaymentsController();
-
-            $paymentRequest = new Request();
-            $paymentRequest->merge([
-                'gateway_id' => $paymentChannel->id,
-                'order_id' => $order->id
-            ]);
-
-            return $paymentController->paymentRequest($paymentRequest);
         }
+
+        return apiResponse2(0, 'disabled_gateway', trans('api.payment.disabled_gateway'));
     }
 
     private function echoRozerpayForm($order)

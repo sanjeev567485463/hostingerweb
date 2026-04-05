@@ -135,6 +135,7 @@ class PaymentController extends Controller
         }
 
         $paymentChannel = PaymentChannel::where('id', $gateway)
+            ->where('class_name', PaymentChannel::$razorpay)
             ->where('status', 'active')
             ->first();
 
@@ -175,6 +176,10 @@ class PaymentController extends Controller
 
     public function paymentVerify(Request $request, $gateway)
     {
+        if ($gateway !== PaymentChannel::$razorpay) {
+            abort(404);
+        }
+
         $paymentChannel = PaymentChannel::where('class_name', $gateway)
             ->where('status', 'active')
             ->first();
